@@ -1,16 +1,22 @@
-from os import listdir
 from os.path import dirname, join as path_join
+from sys import path
+
+path.insert(0, path_join(dirname(dirname(__file__)), "src"))
+
+from os import listdir
 from json import load as json_load
 import unittest
 
 import requests
 
+from config import data_dir
+
 
 class TestAPIInference(unittest.TestCase):
     def setUp(self):
         self.url = "http://localhost:8000/api/run-inference"
-        self.images_dir = path_join(dirname(__file__), "images")
-        self.labels_json_file_path = path_join(dirname(__file__), "labels.json")
+        self.images_dir = path_join(data_dir, "test_images")
+        self.labels_json_file_path = path_join(data_dir, "test_images_labels.json")
 
         with open(self.labels_json_file_path, 'r') as labels_json_file:
             self.labels = json_load(labels_json_file)
