@@ -1,0 +1,15 @@
+training-torch
+    convert to onnx.js
+
+training-tensorflow
+    convert to tf.js
+    conver to onnx.js
+
+Node backend - serve tf.js
+Node backend - serve onnx.js
+
+Fast API backend - serve TF model
+
+frontend-with-apis
+frontend-with-tf.js
+frontend-with-onnx.js
