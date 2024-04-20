@@ -9,6 +9,7 @@ Node backend - serve tf.js
 Node backend - serve onnx.js
 
 Fast API backend - serve TF model
+Fast API backend - serve ONNX model
 
 frontend-with-apis
 frontend-with-tf.js
