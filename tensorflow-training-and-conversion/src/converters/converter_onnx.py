@@ -2,7 +2,6 @@ from os.path import join as path_join
 
 from keras.models import load_model
 import onnx
-from tensorflowjs import converters
 import tf2onnx
 
 from ..config import models_dir

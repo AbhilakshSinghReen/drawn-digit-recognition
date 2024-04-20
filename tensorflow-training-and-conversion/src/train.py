@@ -4,10 +4,10 @@ from os.path import join as path_join
 
 from keras import optimizers
 
-from callbacks import SaveModelPerEpochCallback
-from config import config, models_dir
-from dataset import data_loaders
-from model import CNN
+from .callbacks import SaveModelPerEpochCallback
+from .config import config, models_dir
+from .dataset import data_loaders
+from .model import CNN
 
 
 def train(models_save_dir, num_epochs):
@@ -23,7 +23,7 @@ def train(models_save_dir, num_epochs):
 
 
 if __name__ == "__main__":
-    training_id = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")    
+    training_id = "tensorflow---" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")    
     models_save_dir = path_join(models_dir, training_id)
     makedirs(models_save_dir)
 

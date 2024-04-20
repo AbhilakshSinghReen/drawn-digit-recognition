@@ -2,8 +2,8 @@ from os.path import join as path_join
 
 from keras.models import load_model
 
-from config import models_dir
-from dataset import data_loaders
+from .config import models_dir
+from .dataset import data_loaders
 
 
 MODEL_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number.model")
