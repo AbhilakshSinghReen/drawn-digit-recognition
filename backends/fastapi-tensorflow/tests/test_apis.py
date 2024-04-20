@@ -1,18 +1,53 @@
+from os import listdir
+from os.path import dirname, join as path_join
+from json import load as json_load
+import unittest
+
 import requests
-import os
 
-url = "http://localhost:8000/api/run-inference"
 
-image_file_path = "1.png"
+class TestAPIInference(unittest.TestCase):
+    def setUp(self):
+        self.url = "http://localhost:8000/api/run-inference"
+        self.images_dir = path_join(dirname(__file__), "images")
+        self.labels_json_file_path = path_join(dirname(__file__), "labels.json")
 
-for image_file_path in os.listdir(os.path.dirname(__file__)):
-    if not image_file_path.endswith(".png"):
-        continue
+        with open(self.labels_json_file_path, 'r') as labels_json_file:
+            self.labels = json_load(labels_json_file)
 
-    with open(image_file_path, "rb") as file:
-        response = requests.post(url, files={"file": file})
+    def test_inference(self):
+        num_correct_predictions = 0
+        num_bad_responses = 0
+        all_image_names = listdir(self.images_dir)
 
-    if response.status_code == 200:
-        print(f"Predicted Label: {image_file_path}, ", response.json()["predicted_label"])
-    else:
-        print("Error:", response.text)
+        for image_name in all_image_names:
+            image_file_path = path_join(self.images_dir, image_name)
+
+            with open(image_file_path, "rb") as file:
+                response = requests.post(self.url, files={"file": file})
+
+            if response.status_code != 200:
+                num_bad_responses += 1
+
+            self.assertEqual(response.status_code, 200)
+
+            response_data = response.json()
+
+            if response_data['predicted_label'] == self.labels[image_name]:
+                num_correct_predictions += 1
+
+            print(
+                f"Image: {image_name}, "
+                f"Predicted Label: {response_data['predicted_label']}, "
+                f"Correct: {response_data['predicted_label'] == self.labels[image_name]}"
+            )
+
+        num_inferred = len(all_image_names) - num_bad_responses
+        accuracy = num_correct_predictions / num_inferred
+
+        print(f"Failed to infer: {num_bad_responses} / {len(all_image_names)}")
+        print(f"Correct Predictions: {num_correct_predictions} / {num_inferred}, Accuracy: {accuracy}")
+
+
+if __name__ == '__main__':
+    unittest.main()

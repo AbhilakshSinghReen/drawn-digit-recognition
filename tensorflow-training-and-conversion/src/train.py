@@ -2,8 +2,6 @@ from datetime import datetime
 from os import makedirs
 from os.path import join as path_join
 
-from keras import optimizers
-
 from .callbacks import SaveModelPerEpochCallback
 from .config import config, models_dir
 from .dataset import data_loaders

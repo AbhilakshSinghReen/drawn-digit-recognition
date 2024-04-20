@@ -19,13 +19,13 @@ model.load_weights(MODEL_WEIGHTS_FILE_PATH)
 
 def preprocess_image(image):
     image = cv2.resize(image, (28, 28))
-    image = normalize(image, axis=1)
+    # image = normalize(image, axis=1)
     image = np.array([image])
     return image
 
 
 @app.post("/api/run-inference")
-async def predict_image(file: UploadFile = File(...)):
+async def run_inference(file: UploadFile = File(...)):
     file_contents = await file.read()
     np_arr = np.frombuffer(file_contents, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
