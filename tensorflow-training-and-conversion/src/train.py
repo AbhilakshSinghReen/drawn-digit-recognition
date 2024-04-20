@@ -12,9 +12,7 @@ from .model import CNN
 
 def train(models_save_dir, num_epochs):
     model = CNN()
-    optimizer = optimizers.Adam(lr=0.001)
-    model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
+    
     x_train, y_train = data_loaders['train']
 
     save_model_per_epoch_callback = SaveModelPerEpochCallback(models_save_dir)

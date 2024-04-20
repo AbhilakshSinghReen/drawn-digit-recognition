@@ -1,16 +1,18 @@
-from os.path import join as path_join
+from os.path import dirname, join as path_join
 
-from keras.models import load_model
 from tensorflowjs import converters
 
 from ..config import models_dir
+from ..model import CNN
 
 
-MODEL_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number.model")
-TFJS_MODEL_FILE_PATH = MODEL_FILE_PATH[:-6] + "-tfjs"
+MODEL_WEIGHTS_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number")
+TFJS_MODEL_FILE_PATH = path_join(dirname(MODEL_WEIGHTS_FILE_PATH), "model-tfjs")
 
 
 if __name__ == "__main__":
-    keras_model = load_model(MODEL_FILE_PATH)
+    keras_model = CNN()
+    keras_model.load_weights(MODEL_WEIGHTS_FILE_PATH)
+
     converters.save_keras_model(keras_model, TFJS_MODEL_FILE_PATH)
     print(f"TensorFlow JS model saved at: {TFJS_MODEL_FILE_PATH}")

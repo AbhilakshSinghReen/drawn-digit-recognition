@@ -9,5 +9,5 @@ class SaveModelPerEpochCallback(callbacks.Callback):
         self.models_save_dir = models_save_dir
 
     def on_epoch_end(self, epoch, logs=None):
-        model_save_file_path = path_join(self.models_save_dir, f"epoch-{epoch}.model")
-        self.model.save(model_save_file_path)
+        model_save_file_path = path_join(self.models_save_dir, f"epoch-{epoch}.h5")
+        self.model.save_weights(model_save_file_path, save_format="h5")

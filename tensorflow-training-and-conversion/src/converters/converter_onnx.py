@@ -1,18 +1,20 @@
-from os.path import join as path_join
+from os.path import dirname, join as path_join
 
-from keras.models import load_model
 import onnx
 import tf2onnx
 
 from ..config import models_dir
+from ..model import CNN
 
 
-MODEL_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number.model")
-ONNX_MODEL_FILE_PATH = MODEL_FILE_PATH[:-6] + ".onnx"
+MODEL_WEIGHTS_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number")
+ONNX_MODEL_FILE_PATH = path_join(dirname(MODEL_WEIGHTS_FILE_PATH), "model.onnx")
 
 
 if __name__ == "__main__":
-    keras_model = load_model(MODEL_FILE_PATH)
+    keras_model = CNN()
+    keras_model.load_weights(MODEL_WEIGHTS_FILE_PATH)
+
     onnx_model, _ = tf2onnx.convert.from_keras(keras_model)
     
     onnx.save(onnx_model, ONNX_MODEL_FILE_PATH)
