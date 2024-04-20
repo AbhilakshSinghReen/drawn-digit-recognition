@@ -4,17 +4,18 @@ import cv2
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import numpy as np
+import onnxruntime
 
 from .config import models_dir
-from .model import CNN
 
 
 app = FastAPI()
 
-MODEL_WEIGHTS_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number.h5")
+ONNX_MODEL_FILE_PATH = path_join(models_dir, "training_id", "model.onnx")
 
-model = CNN()
-model.load_weights(MODEL_WEIGHTS_FILE_PATH)
+ort_session = onnxruntime.InferenceSession(ONNX_MODEL_FILE_PATH)
+ort_session_input_name = ort_session.get_inputs()[0].name
+ort_session_output_name = ort_session.get_outputs()[0].name
 
 
 def normalize(x, axis=-1, order=2):
@@ -29,7 +30,7 @@ def normalize(x, axis=-1, order=2):
 
 def preprocess_image(image):
     image = image.astype(np.float32)
-    image = np.array([image])
+    image = image[np.newaxis, :, :, np.newaxis]
     image = normalize(image, axis=1)
     return image
 
@@ -42,7 +43,12 @@ async def run_inference(file: UploadFile = File(...)):
 
     preprocessed_image = preprocess_image(image)
 
-    prediction = model.predict(preprocessed_image)
+    prediction = ort_session.run(
+        [ort_session_output_name],
+        {
+            ort_session_input_name: preprocessed_image,
+        }
+    )
 
     predicted_label = int(np.argmax(prediction))
 
