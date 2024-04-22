@@ -5,7 +5,7 @@
 models
 
 **/*.png
-**/*.json
+**/test_images_labels.json
 
 **/node_modules
 **/cache

@@ -1,0 +1,17 @@
+{
+  "name": "express-onnx",
+  "version": "1.0.0",
+  "description": "Express.js inference API for ONNX models.",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abhilaksh Singh Reen",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "onnxruntime-node": "^1.17.3",
+    "sharp": "^0.33.3"
+  }
+}
