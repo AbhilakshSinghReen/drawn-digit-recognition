@@ -6,3 +6,6 @@ models
 
 **/*.png
 **/*.json
+
+**/node_modules
+**/cache
