@@ -18,9 +18,6 @@ ort_session = onnxruntime.InferenceSession(ONNX_MODEL_FILE_PATH)
 ort_session_input_name = ort_session.get_inputs()[0].name
 ort_session_output_name = ort_session.get_outputs()[0].name
 
-print(ort_session_input_name)
-print(ort_session_output_name)
-
 
 def normalize(x, axis=-1, order=2):
     "Taken from: https://github.com/keras-team/keras/blob/v3.2.1/keras/utils/numerical_utils.py#L7-L34"
@@ -53,9 +50,6 @@ async def run_inference(file: UploadFile = File(...)):
     image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
 
     preprocessed_image = preprocess_image_2(image)
-    print(preprocessed_image.shape)
-    print()
-    print()
 
     prediction = ort_session.run(
         [ort_session_output_name],
