@@ -6,7 +6,7 @@ from ..config import models_dir
 from ..model import CNN
 
 
-MODEL_WEIGHTS_FILE_PATH = path_join(models_dir, "training_id", "epoch-epoch_number")
+MODEL_WEIGHTS_FILE_PATH = path_join(models_dir, "tensorflow---2024-04-21-22-04-45", "epoch-9.h5")
 TFJS_MODEL_FILE_PATH = path_join(dirname(MODEL_WEIGHTS_FILE_PATH), "model-tfjs")
 
 

@@ -3,9 +3,14 @@
 **/env
 
 models
+**/data
 
 **/*.png
 **/test_images_labels.json
 
 **/node_modules
 **/cache
+
+backends/express-tensorflow-js
+
+**/*.sarif

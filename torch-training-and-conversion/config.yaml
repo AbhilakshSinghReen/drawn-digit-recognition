@@ -1,0 +1,6 @@
+training_num_epochs: 10
+training_save_weights_epoch_interval: 1
+training_batch_size: 100
+learning_rate: 0.001
+testing_batch_size: 100
+log_batch_interval: 100

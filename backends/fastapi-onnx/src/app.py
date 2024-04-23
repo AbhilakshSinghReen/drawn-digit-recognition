@@ -12,10 +12,14 @@ from .config import models_dir
 app = FastAPI()
 
 ONNX_MODEL_FILE_PATH = path_join(models_dir, "training_id", "model.onnx")
+ONNX_MODEL_FILE_PATH = path_join(models_dir, "torch---2024-04-23-08-25-15", "model.onnx")
 
 ort_session = onnxruntime.InferenceSession(ONNX_MODEL_FILE_PATH)
 ort_session_input_name = ort_session.get_inputs()[0].name
 ort_session_output_name = ort_session.get_outputs()[0].name
+
+print(ort_session_input_name)
+print(ort_session_output_name)
 
 
 def normalize(x, axis=-1, order=2):
@@ -28,9 +32,16 @@ def normalize(x, axis=-1, order=2):
     return x / np.expand_dims(norm, axis)
 
 
-def preprocess_image(image):
+def preprocess_image_1(image):
     image = image.astype(np.float32)
     image = image[np.newaxis, :, :, np.newaxis]
+    image = normalize(image, axis=1)
+    return image
+
+
+def preprocess_image_2(image):
+    image = image.astype(np.float32)
+    image = image[np.newaxis, np.newaxis, :, :]
     image = normalize(image, axis=1)
     return image
 
@@ -41,7 +52,10 @@ async def run_inference(file: UploadFile = File(...)):
     np_arr = np.frombuffer(file_contents, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
 
-    preprocessed_image = preprocess_image(image)
+    preprocessed_image = preprocess_image_2(image)
+    print(preprocessed_image.shape)
+    print()
+    print()
 
     prediction = ort_session.run(
         [ort_session_output_name],
