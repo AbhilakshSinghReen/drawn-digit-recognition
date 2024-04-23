@@ -12,7 +12,7 @@ const { softmax, indexMax } = require("./mathUtils");
 const PORT = process.env.PORT || 8000;
 
 // const modelPath = path.join(modelsDir, "trainingId", "model.onnx")
-const modelPath = path.join(modelsDir, "tensorflow---2024-04-20-18-35-16", "model.onnx");
+const modelPath = path.join(modelsDir, "torch---2024-04-23-08-25-15", "model.onnx");
 
 const app = express();
 const multipartMiddleware = multer({ dest: "cache/" });

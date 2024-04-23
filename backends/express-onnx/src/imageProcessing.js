@@ -2,7 +2,8 @@ const ort = require("onnxruntime-node");
 const sharp = require("sharp");
 
 const inputImageShape = [28, 28];
-const inputShape = [1, 28, 28, 1];
+// const inputShape = [1, 28, 28, 1];
+const inputShape = [1, 1, 28, 28];
 
 async function loadImageAsUint8Array(imagePath) {
   const image = sharp(imagePath).resize(inputImageShape[0], inputImageShape[1]).greyscale();
