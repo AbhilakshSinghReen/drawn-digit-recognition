@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 
+import { dataURIToBlob } from "../utils/fileUtils";
+
 export default function Home() {
   const stageSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.5);
 
   const [tool, setTool] = useState("pen");
   const [lines, setLines] = useState([]);
-  const [strokeWidth, setStrokeWidth] = useState(5);
+  const [strokeWidth, setStrokeWidth] = useState(15);
   const [prediction, setPrediction] = useState(null);
 
   const stageRef = useRef(null);
@@ -39,6 +41,32 @@ export default function Home() {
     isDrawing.current = false;
   };
 
+  const handlePredictButtonClick = async (e) => {
+    const stageImageDataUri = stageRef.current.toDataURL();
+    const stageImageBlob = dataURIToBlob(stageImageDataUri);
+
+    const formData = new FormData();
+    formData.append("file", stageImageBlob, "image.jpg");
+
+    let responseData;
+    try {
+      const response = await fetch("http://localhost:8000/api/run-inference?image_provider=konva", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        window.alert("Server failed to predict.");
+      }
+
+      responseData = await response.json();
+    } catch (error) {
+      window.alert("Server failed to predict.");
+    }
+
+    setPrediction(responseData.predicted_label);
+  };
+
   return (
     <div
       style={{
@@ -49,7 +77,8 @@ export default function Home() {
         alignItems: "center",
       }}
     >
-      <h1>Hello</h1>
+      <h1>Drawn Digit Prediction</h1>
+
       <Stage
         ref={stageRef}
         width={stageSize}
@@ -143,7 +172,7 @@ export default function Home() {
       </div>
 
       <button
-        onClick={() => setLines([])}
+        onClick={handlePredictButtonClick}
         style={{
           padding: "8px 12px",
           borderRadius: "4px",
@@ -159,7 +188,7 @@ export default function Home() {
         Predict
       </button>
 
-      {prediction && (
+      {prediction !== null && (
         <h4
           style={{
             margin: 0,
