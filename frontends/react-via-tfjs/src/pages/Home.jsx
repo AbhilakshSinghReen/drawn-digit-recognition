@@ -1,15 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
-// import sharp from "sharp";
 
+import { preprocessImageData } from "../inferencing/imageProcessing";
+import { recognizeDigit } from "../inferencing/recognizer";
 import { dataURIToBlob } from "../utils/fileUtils";
 
-// import runInference from "../inferencing/onnx";
-
-export default function Home({ ort }) {
+export default function Home() {
   const stageSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.5);
 
-  const [ortSession, setOrtSession] = useState(null);
   const [tool, setTool] = useState("pen");
   const [lines, setLines] = useState([]);
   const [strokeWidth, setStrokeWidth] = useState(15);
@@ -17,14 +15,7 @@ export default function Home({ ort }) {
 
   const stageRef = useRef(null);
   const isDrawing = useRef(false);
-
-  const createOrtSession = async () => {
-    const modelPath = "";
-    const modelUrl = process.env.PUBLIC_URL + "/model.onnx";
-    const newOrtSession = await ort.InferenceSession.create(modelUrl);
-
-    setOrtSession(newOrtSession);
-  };
+  const canvasRef = useRef(null);
 
   const handleMouseDown = (e) => {
     isDrawing.current = true;
@@ -54,23 +45,55 @@ export default function Home({ ort }) {
   };
 
   const handlePredictButtonClick = async (e) => {
-    // const imageDataUri = stageRef.current.toDataURL();
-    // const imageBlob = dataURIToBlob(imageDataUri);
-    // const imageBuffer = await imageBlob.arrayBuffer();
+    const stageImageDataUri = stageRef.current.toDataURL();
+    const stageImageBlob = dataURIToBlob(stageImageDataUri);
 
-    const imageUint8Array = new Uint8Array(784);
-    for (let i = 0; i < 784; i++) {
-      imageUint8Array[i] = Math.floor(Math.random() * 256); // Random integer between 0 and 255
-    }
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
-    // const imageUint8Array = new Uint8Array(imageBuffer);
-    // const prediction = runInference(imageUint8Array);
-    setPrediction(prediction);
+    const img = new Image();
+
+    img.src = URL.createObjectURL(stageImageBlob);
+
+    img.onload = () => {
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = 28;
+      tempCanvas.height = 28;
+      const tempCtx = tempCanvas.getContext("2d");
+
+      // Draw the image on the temporary canvas
+      tempCtx.drawImage(img, 0, 0, 28, 28);
+
+      // Get the image data of the temporary canvas
+      const imageData = tempCtx.getImageData(0, 0, 28, 28);
+      const { data } = imageData;
+
+      // Create a new ImageData object with only alpha channel data
+      const inputImageData = new ImageData(new Uint8ClampedArray(data.length), 28, 28);
+      // r1, g1, b1, a1, r2, g2, b2, a2, ...
+
+      // Extract alpha channel from the original image data
+      for (let i = 3; i < data.length; i += 4) {
+        inputImageData.data[i] = 255;
+        inputImageData.data[i - 1] = data[i];
+        inputImageData.data[i - 2] = data[i];
+        inputImageData.data[i - 3] = data[i];
+      }
+
+      // Draw the alpha channel data on the main canvas
+      ctx.putImageData(inputImageData, 0, 0);
+
+      const preprocessedImageData = preprocessImageData(inputImageData.data);
+
+      const inferencingResult = recognizeDigit(preprocessedImageData);
+      if (!inferencingResult.success) {
+        // throw error
+        return;
+      }
+
+      setPrediction(inferencingResult.prediction);
+    };
   };
-
-  useEffect(() => {
-    createOrtSession();
-  }, []);
 
   return (
     <div
@@ -202,6 +225,8 @@ export default function Home({ ort }) {
           Probably a {prediction}
         </h4>
       )}
+
+      <canvas ref={canvasRef} width={28} height={28}></canvas>
     </div>
   );
 }

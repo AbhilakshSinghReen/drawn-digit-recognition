@@ -57,11 +57,13 @@ export default function Home() {
 
       if (!response.ok) {
         window.alert("Server failed to predict.");
+        return;
       }
 
       responseData = await response.json();
     } catch (error) {
       window.alert("Server failed to predict.");
+      return;
     }
 
     setPrediction(responseData.predicted_label);
