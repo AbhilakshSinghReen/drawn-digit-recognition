@@ -1,10 +1,6 @@
-from os.path import dirname, join as path_join
-from sys import path
-
-path.insert(0, path_join(dirname(dirname(__file__)), "src"))
-
-from os import listdir
 from json import load as json_load
+from os import listdir
+from os.path import join as path_join
 import unittest
 
 import requests

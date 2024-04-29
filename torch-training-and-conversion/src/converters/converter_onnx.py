@@ -1,7 +1,5 @@
 from os.path import dirname, join as path_join
 
-# import onnx
-# import tf2onnx
 import torch
 
 from ..config import models_dir
@@ -24,24 +22,12 @@ if __name__ == "__main__":
 
     torch_model.eval()
 
-    print(len(data_loaders["test"]))
-    
-
     for data, target in data_loaders["test"]:
         data = data.to(device)
         target = target.to(device)
-        print(data[0].shape)
-        print(target.shape)
         break
-    
-    # exit()
-
-    print(data.shape)
 
     sample_input = data[0].unsqueeze(0)
-
-    print(sample_input.shape)
-
 
     onnx_model = torch.onnx.dynamo_export(
         torch_model,
@@ -49,13 +35,3 @@ if __name__ == "__main__":
     )
 
     onnx_model.save(ONNX_MODEL_FILE_PATH)
-
-
-
-
-
-
-    # onnx_model, _ = tf2onnx.convert.from_keras(torch_model)
-    
-    # onnx.save(onnx_model, ONNX_MODEL_FILE_PATH)
-    # print(f"ONNX model saved at: {ONNX_MODEL_FILE_PATH}")

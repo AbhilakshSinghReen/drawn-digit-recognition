@@ -87,7 +87,7 @@ export default function Home() {
 
       const inferencingResult = recognizeDigit(preprocessedImageData);
       if (!inferencingResult.success) {
-        // throw error
+        window.alert("Could not recognize digit.");
         return;
       }
 

@@ -1,10 +1,8 @@
 from json import load as json_load
 from os import listdir
 from os.path import join as path_join
-from time import time
 
 import cv2
-import numpy as np
 import torch
 from torchvision import transforms
 
@@ -26,10 +24,6 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load(MODEL_WEIGHTS_FILE_PATH, map_location=device))
 
     model.eval()
-
-    preprocessing_transforms = transforms.Compose([
-        transforms.ToTensor(),
-    ])
 
     print("Testing on MNIST Test Set")
 
@@ -56,7 +50,11 @@ if __name__ == "__main__":
     print(f"    Accuracy: {accuracy}")
     print()
 
-     ### Test on Custom Images
+    ### Test on Custom Images
+    preprocessing_transforms = transforms.Compose([
+        transforms.ToTensor(),
+    ])
+
     # Load Images
     test_images_dir = path_join(data_dir, "test_images")
     
@@ -75,16 +73,8 @@ if __name__ == "__main__":
 
     # Preprocess
     for i in range(len(test_images)):
-        # test_images[i] = np.array([test_images[i]])
-        # test_images[i] = normalize(test_images[i], axis=1)
         test_images[i] = preprocessing_transforms(test_images[i])
         test_images[i] = test_images[i].unsqueeze(0)
-
-    print(type(test_images[0]))
-    print(test_images[0].dtype)
-    print(test_images[0].shape)
-    print(torch.min(test_images[0]))
-    print(torch.max(test_images[0]))
 
     # Predict
     num_correct = 0
