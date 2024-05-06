@@ -158,7 +158,13 @@ export default function Home() {
         </select>
 
         <button
-          onClick={() => setLines([])}
+          onClick={() => {
+            if (!window.confirm("Are you sure you want to clear your drawing? This operation cannot be undone.")) {
+              return;
+            }
+
+            setLines([]);
+          }}
           style={{
             padding: "8px 12px",
             borderRadius: "4px",

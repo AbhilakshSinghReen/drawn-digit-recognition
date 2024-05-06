@@ -46,14 +46,13 @@ export default function Home() {
 
   const handlePredictButtonClick = async (e) => {
     const stageImageDataUri = stageRef.current.toDataURL();
-    const stageImageBlob = dataURIToBlob(stageImageDataUri);
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
     const img = new Image();
 
-    img.src = URL.createObjectURL(stageImageBlob);
+    img.src = stageImageDataUri;
 
     img.onload = () => {
       const tempCanvas = document.createElement("canvas");
@@ -61,29 +60,24 @@ export default function Home() {
       tempCanvas.height = 28;
       const tempCtx = tempCanvas.getContext("2d");
 
-      // Draw the image on the temporary canvas
       tempCtx.drawImage(img, 0, 0, 28, 28);
 
-      // Get the image data of the temporary canvas
       const imageData = tempCtx.getImageData(0, 0, 28, 28);
-      const { data } = imageData;
+      const imageArray = imageData.data;
+      // r(1, 1), g(1, 1), b(1, 1), a(1, 1), r(2, 1), g(2, 1), b(2, 1), a(2, 1), ...
 
-      // Create a new ImageData object with only alpha channel data
-      const inputImageData = new ImageData(new Uint8ClampedArray(data.length), 28, 28);
-      // r1, g1, b1, a1, r2, g2, b2, a2, ...
+      const alphaChannelOnlyImageData = new ImageData(new Uint8ClampedArray(imageArray.length), 28, 28);
 
-      // Extract alpha channel from the original image data
-      for (let i = 3; i < data.length; i += 4) {
-        inputImageData.data[i] = 255;
-        inputImageData.data[i - 1] = data[i];
-        inputImageData.data[i - 2] = data[i];
-        inputImageData.data[i - 3] = data[i];
+      for (let i = 3; i < imageArray.length; i += 4) {
+        alphaChannelOnlyImageData.data[i] = 255;
+        alphaChannelOnlyImageData.data[i - 1] = imageArray[i];
+        alphaChannelOnlyImageData.data[i - 2] = imageArray[i];
+        alphaChannelOnlyImageData.data[i - 3] = imageArray[i];
       }
 
-      // Draw the alpha channel data on the main canvas
-      ctx.putImageData(inputImageData, 0, 0);
+      ctx.putImageData(alphaChannelOnlyImageData, 0, 0);
 
-      const preprocessedImageData = preprocessImageData(inputImageData.data);
+      const preprocessedImageData = preprocessImageData(alphaChannelOnlyImageData.data);
 
       const inferencingResult = recognizeDigit(preprocessedImageData);
       if (!inferencingResult.success) {

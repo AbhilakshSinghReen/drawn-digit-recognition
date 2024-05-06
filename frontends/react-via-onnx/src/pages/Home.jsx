@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
-// import sharp from "sharp";
 
-import { dataURIToBlob } from "../utils/fileUtils";
+import runInference from "../inferencing/onnx";
 
-// import runInference from "../inferencing/onnx";
-
-export default function Home({ ort }) {
+export default function Home() {
   const stageSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.5);
 
-  const [ortSession, setOrtSession] = useState(null);
   const [tool, setTool] = useState("pen");
   const [lines, setLines] = useState([]);
   const [strokeWidth, setStrokeWidth] = useState(15);
@@ -17,14 +13,6 @@ export default function Home({ ort }) {
 
   const stageRef = useRef(null);
   const isDrawing = useRef(false);
-
-  const createOrtSession = async () => {
-    const modelPath = "";
-    const modelUrl = process.env.PUBLIC_URL + "/model.onnx";
-    const newOrtSession = await ort.InferenceSession.create(modelUrl);
-
-    setOrtSession(newOrtSession);
-  };
 
   const handleMouseDown = (e) => {
     isDrawing.current = true;
@@ -54,23 +42,11 @@ export default function Home({ ort }) {
   };
 
   const handlePredictButtonClick = async (e) => {
-    // const imageDataUri = stageRef.current.toDataURL();
-    // const imageBlob = dataURIToBlob(imageDataUri);
-    // const imageBuffer = await imageBlob.arrayBuffer();
+    const imageDataUri = stageRef.current.toDataURL();
 
-    const imageUint8Array = new Uint8Array(784);
-    for (let i = 0; i < 784; i++) {
-      imageUint8Array[i] = Math.floor(Math.random() * 256); // Random integer between 0 and 255
-    }
-
-    // const imageUint8Array = new Uint8Array(imageBuffer);
-    // const prediction = runInference(imageUint8Array);
+    const prediction = await runInference(imageDataUri);
     setPrediction(prediction);
   };
-
-  useEffect(() => {
-    createOrtSession();
-  }, []);
 
   return (
     <div
@@ -202,6 +178,8 @@ export default function Home({ ort }) {
           Probably a {prediction}
         </h4>
       )}
+
+      <canvas id="tempCanvas" width={28} height={28}></canvas>
     </div>
   );
 }
