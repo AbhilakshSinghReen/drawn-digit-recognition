@@ -1,3 +1,7 @@
+# Important Note
+After installing the required packages, copy all the `.wasm` files from `node_modules/onnxruntime-web/dist` to `public/static/js`.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
